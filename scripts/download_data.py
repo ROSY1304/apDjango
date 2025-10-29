@@ -1,37 +1,36 @@
 import os
 import requests
-from zipfile import ZipFile
 
 # === CONFIGURACIÓN ===
-# URLs de tus carpetas en Drive convertidas a descargas ZIP
+# URLs directas de descarga desde Google Drive
 folders = {
-    "user_datasets": "https://drive.google.com/file/d/1SQD2lpRCVEF-hBOnLXbeiwdTS0XIyTTV/view?usp=drive_link",
-    "datasets": "https://drive.google.com/file/d/1qV0FIrHDwlsgv4thV9sa5YB6rkPhklTN/view?usp=drive_link",
-    "modelo": "https://drive.google.com/file/d/11u2pm9kWffxqdeaHQVCwI95vVudVl_1n/view?usp=drive_link",
+    "user_datasets": "https://drive.google.com/uc?export=download&id=1SQD2lpRCVEF-hBOnLXbeiwdTS0XIyTTV",
+    "datasets": "https://drive.google.com/uc?export=download&id=1qV0FIrHDwlsgv4thV9sa5YB6rkPhklTN",
+    "modelo": "https://drive.google.com/uc?export=download&id=11u2pm9kWffxqdeaHQVCwI95vVudVl_1n"
 }
 
 # === FUNCIONES ===
-def download_file(url, output):
-    print(f"⬇️  Descargando {output} ...")
-    r = requests.get(url, stream=True)
-    if r.status_code != 200:
-        print(f"⚠️ Error descargando {url}")
-        return
-    with open(output, "wb") as f:
-        for chunk in r.iter_content(chunk_size=8192):
-            f.write(chunk)
-    print(f"✅ Descargado {output}")
+def download_file(url, output_path):
+    print(f"⬇️ Descargando {output_path} ...")
+    try:
+        r = requests.get(url, stream=True)
+        r.raise_for_status()
+        with open(output_path, "wb") as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
+        print(f"✅ Descargado correctamente: {output_path}")
+    except Exception as e:
+        print(f"⚠️ Error al descargar {url}: {e}")
 
-def extract_zip(path, target_dir):
-    print(f"📦 Extrayendo {path} ...")
-    with ZipFile(path, "r") as zip_ref:
-        zip_ref.extractall(target_dir)
-    os.remove(path)
-    print(f"✅ Extraído en {target_dir}")
+# === DESCARGA DE ARCHIVOS ===
+os.makedirs("datasets", exist_ok=True)
+os.makedirs("models", exist_ok=True)
 
-# === DESCARGA Y EXTRACCIÓN ===
-os.makedirs("data_cache", exist_ok=True)
 for name, url in folders.items():
-    target_zip = f"data_cache/{name}.zip"
-    download_file(url, target_zip)
-    extract_zip(target_zip, name)
+    if "modelo" in name:
+        path = os.path.join("models", f"{name}.pkl")
+    else:
+        path = os.path.join("datasets", f"{name}.csv")
+    download_file(url, path)
+
+print("🎉 Todos los archivos fueron descargados correctamente.")
