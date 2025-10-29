@@ -51,7 +51,9 @@ SECRET_KEY = "django-insecure-a4nwaw--zc^xbbn2gusb&hiftr=+$d7ckhjshn=os&#*fm201!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['apdjango.onrender.com', 'localhost', '127.0.0.1']
+import os
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost').split(',')
+
 
 
 
