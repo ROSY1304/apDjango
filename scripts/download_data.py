@@ -2,14 +2,12 @@ import os
 import requests
 
 # === CONFIGURACIÓN ===
-# URLs directas de descarga desde Google Drive
 folders = {
     "user_datasets": "https://drive.google.com/uc?export=download&id=1SQD2lpRCVEF-hBOnLXbeiwdTS0XIyTTV",
     "datasets": "https://drive.google.com/uc?export=download&id=1qV0FIrHDwlsgv4thV9sa5YB6rkPhklTN",
     "modelo": "https://drive.google.com/uc?export=download&id=11u2pm9kWffxqdeaHQVCwI95vVudVl_1n"
 }
 
-# === FUNCIONES ===
 def download_file(url, output_path):
     print(f"⬇️ Descargando {output_path} ...")
     try:
@@ -24,13 +22,12 @@ def download_file(url, output_path):
 
 # === DESCARGA DE ARCHIVOS ===
 os.makedirs("datasets", exist_ok=True)
-os.makedirs("models", exist_ok=True)
+os.makedirs("user_datasets", exist_ok=True)
+os.makedirs("modelo", exist_ok=True)
 
-for name, url in folders.items():
-    if "modelo" in name:
-        path = os.path.join("models", f"{name}.pkl")
-    else:
-        path = os.path.join("datasets", f"{name}.csv")
-    download_file(url, path)
+# Guardar en las rutas que Django espera
+download_file(folders["user_datasets"], "user_datasets/user_datasets.csv")
+download_file(folders["datasets"], "datasets/datasets.csv")
+download_file(folders["modelo"], "modelo/rf_clasificador.joblib")
 
 print("🎉 Todos los archivos fueron descargados correctamente.")
